@@ -359,6 +359,8 @@ monthname(12) -> "december";
 monthname(_) -> "???".
 
 % Utility functions
+integer_to_list_zerofill(N) when is_float(N) -> %% fix for pgsql datetime with timezone
+	integer_to_list_zerofill(round(N));
 integer_to_list_zerofill(N) when N < 10 ->
     lists:flatten(io_lib:format("~2..0B", [N]));
 integer_to_list_zerofill(N) ->

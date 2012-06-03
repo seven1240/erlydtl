@@ -195,6 +195,7 @@ date(Input) ->
     date(Input, "F j, Y").
 
 %% @doc Formats a date according to the given format.
+date(null, _) -> <<"null">>;
 date(Input, FormatStr) when is_binary(Input) ->
     list_to_binary(date(binary_to_list(Input), FormatStr));
 date({{_,_,_} = Date,{_,_,_} = Time}, FormatStr) ->
