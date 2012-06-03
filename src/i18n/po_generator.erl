@@ -21,7 +21,7 @@ generate_file(Lang,Items, Fuzzy) ->
 	io:format("Opening po file"),
 	gettext_compile:open_po_file(Gettext_App_Name, GtxtDir, Lang),
 	
-	gettext_compile:write_header(),
+	gettext_compile:write_header(Lang),
 	io:format("Writing entries~n"),
     write_entries(Items),
 	io:format("Writing fuzzy entries~n"),

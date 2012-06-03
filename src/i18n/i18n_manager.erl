@@ -19,8 +19,8 @@
 
 generate_pos([Lang,Files])->
         io:format("~s -> ~s ~n",[Lang,Files]),
-        {ok, SplittedLocales} = string:tokens(Lang,","),
-	{ok, SplittedFiles} = string:tokens(Files, ","),
+	SplittedLocales = string:tokens(Lang,","),
+	SplittedFiles = string:tokens(Files, ","),
 	ProcessedFiles = sources_parser:parse(SplittedFiles),
 	io:format("Parsed tokens are ~p~n",[ProcessedFiles]),
 	BaseDir = "lang/default/",
