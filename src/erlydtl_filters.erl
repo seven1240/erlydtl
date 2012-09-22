@@ -152,13 +152,52 @@
 -define(SECONDS_PER_MONTH, (30 * ?SECONDS_PER_DAY)).
 -define(SECONDS_PER_YEAR, (365 * ?SECONDS_PER_DAY)).
  
-%% @doc Adds a number to the value.
-add(Input, Number) when is_binary(Input) ->
-    list_to_binary(add(binary_to_list(Input), Number));
-add(Input, Number) when is_list(Input) ->
-    integer_to_list(add(list_to_integer(Input), Number));
-add(Input, Number) when is_integer(Input) ->
-    Input + Number.
+%% @doc Adds to values
+add(LHS, RHS) when is_number(LHS), is_number(RHS) ->
+    LHS + RHS;
+add(LHS, RHS) when is_binary(LHS) ->
+    add(binary_to_list(LHS), RHS);
+add(LHS, RHS) when is_binary(RHS) ->
+    add(LHS, binary_to_list(RHS));
+add(LHS, RHS) when is_list(LHS), is_list(RHS) ->
+    case {to_numeric(LHS), to_numeric(RHS)} of
+	{{number, LHSNum}, {number, RHSNum}} ->
+	    LHSNum + RHSNum;
+	_ ->
+	    LHS ++ RHS
+    end;
+add(LHS, RHS) when is_list(LHS), is_number(RHS) ->
+    case to_numeric(LHS) of
+	{number, LHSNum} ->
+	    LHSNum + RHS;
+	_ ->
+	    LHS ++ to_string(RHS)
+    end;
+add(LHS, RHS) when is_number(LHS), is_list(RHS) ->
+    case to_numeric(RHS) of
+	{number, RHSNum} ->
+	    LHS + RHSNum;
+	_ ->
+	    to_string(LHS) ++ RHS
+    end.
+
+to_string(Num) when is_integer(Num) ->
+    integer_to_list(Num);
+to_string(Num) when is_float(Num) ->
+    float_to_list(Num).
+
+to_numeric(List) ->
+    try
+	{number, list_to_integer(List)}
+    catch
+	error:badarg ->
+	    try
+		{number, list_to_float(List)}
+	    catch
+		error:badarg ->
+		    undefined
+	    end
+    end.
  
 %% @doc Adds slashes before quotes.
 addslashes(Input) when is_binary(Input) ->
@@ -219,10 +258,21 @@ default_if_none(undefined, Default) ->
 default_if_none(Input, _) ->
     Input.
 
-%% @doc Takes a list of dictionaries and returns that list sorted by the key given in the argument.
+%% @doc Takes a list of dictionaries or proplists and returns that list sorted by the key given in the argument.
+dictsort(DictList, Key) when is_binary(Key) ->
+    dictsort(DictList, [binary_to_atom(B,latin1) ||
+			   B <- binary:split(Key,<<".">>)]);
 dictsort(DictList, Key) ->
-    case lists:all(fun(Dict) -> dict:is_key(Key, Dict) end, DictList) of
-        true -> lists:sort(fun(K1,K2) -> dict:find(Key,K1) =< dict:find(Key,K2) end, DictList);
+    case lists:all(
+	   fun(Dict) ->
+		   erlydtl_runtime:find_deep_value(Key, Dict) /= undefined
+	   end, DictList) of
+        true ->
+	    lists:sort(
+	      fun(K1,K2) ->
+		      erlydtl_runtime:find_deep_value(Key,K1) =<
+			  erlydtl_runtime:find_deep_value(Key,K2)
+	      end, DictList);
         false -> error
     end.
 
@@ -992,6 +1042,8 @@ truncatechars(_Input, 0, Acc) ->
 truncatechars([C|Rest], CharsLeft, Acc) ->
     truncatechars(Rest, CharsLeft - 1, [C|Acc]).
 
+truncatewords(Value, _WordsLeft, _Acc) when is_atom(Value) ->
+    Value;
 truncatewords([], _WordsLeft, Acc) ->
     lists:reverse(Acc);
 truncatewords(_Input, 0, Acc) ->
