@@ -1035,8 +1035,14 @@ title([Char | Rest], [$\  |_] = Acc) when Char >= $a, Char =< $z ->
 title([Char | Rest], Acc) ->
     title(Rest, [Char | Acc]).
 
+truncatechars(null, _CharsLeft, Acc) ->
+    [];
 truncatechars([], _CharsLeft, Acc) ->
     lists:reverse(Acc);
+truncatechars([C|Rest], 0, Acc) when C > 191 ->
+    lists:reverse(Acc);
+truncatechars([C|Rest], 0, Acc) when C > 127 ->
+    truncatechars(Rest, 0, [C|Acc]);
 truncatechars(_Input, 0, Acc) ->
     lists:reverse("..." ++ Acc);
 truncatechars([C|Rest], CharsLeft, Acc) ->
