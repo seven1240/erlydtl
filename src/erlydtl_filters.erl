@@ -53,6 +53,7 @@
         cut/2,
         date/1,
         date/2,
+        hseconds/1,
         default/2,
         default_if_none/2,
         dictsort/2,
@@ -244,6 +245,20 @@ date({_,_,_} = Date, FormatStr) ->
 date(Input, _FormatStr) when is_list(Input) ->
     io:format("Unexpected date parameter : ~p~n", [Input]),
     "".
+
+%% @doc Humanize seconds from 61 seconds to 00:01:01
+hseconds(null) -> <<"null">>;
+hseconds(I) when is_integer(I) ->
+    S = I rem 60,
+    M = I div 60,
+    M1 = M rem 60,
+    H = M1 div 60,
+    case H == 0 of
+        true ->
+            io_lib:format("~2.10.0b:~2.10.0b", [M1, S]);
+        false ->
+            io_lib:format("~2.10.0b:~2.10.0b:~2.10.0b", [H, M1, S])
+    end.
 
 %% @doc If value evaluates to `false', use given default. Otherwise, use the value.
 default(Input, Default) ->
