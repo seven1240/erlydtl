@@ -53,6 +53,7 @@
         cut/2,
         date/1,
         date/2,
+        null_to_hyphen/1,
         hseconds/1,
         default/2,
         default_if_none/2,
@@ -235,7 +236,7 @@ date(Input) ->
     date(Input, "F j, Y").
 
 %% @doc Formats a date according to the given format.
-date(null, _) -> <<"null">>;
+date(null, _) -> <<"-">>;
 date(Input, FormatStr) when is_binary(Input) ->
     list_to_binary(date(binary_to_list(Input), FormatStr));
 date({{_,_,_} = Date,{_,_,_} = Time}, FormatStr) ->
@@ -245,6 +246,9 @@ date({_,_,_} = Date, FormatStr) ->
 date(Input, _FormatStr) when is_list(Input) ->
     io:format("Unexpected date parameter : ~p~n", [Input]),
     "".
+
+null_to_hyphen(null) -> <<"-">>;
+null_to_hyphen(Input) -> Input.
 
 %% @doc Humanize seconds from 61 seconds to 00:01:01
 hseconds(null) -> <<"null">>;
