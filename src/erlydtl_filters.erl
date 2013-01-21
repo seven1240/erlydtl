@@ -237,6 +237,7 @@ date(Input) ->
 
 %% @doc Formats a date according to the given format.
 date(null, _) -> <<"-">>;
+date(undefined, _) -> <<"-">>;
 date(Input, FormatStr) when is_binary(Input) ->
     list_to_binary(date(binary_to_list(Input), FormatStr));
 date({{_,_,_} = Date,{_,_,_} = Time}, FormatStr) ->
