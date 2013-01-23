@@ -54,6 +54,8 @@
         date/1,
         date/2,
         null_to_hyphen/1,
+        null/1,
+        null/2,
         hseconds/1,
         default/2,
         default_if_none/2,
@@ -236,7 +238,7 @@ date(Input) ->
     date(Input, "F j, Y").
 
 %% @doc Formats a date according to the given format.
-date(null, _) -> <<"-">>;
+date(null, _) -> <<"">>;
 date(Input, FormatStr) when is_binary(Input) ->
     list_to_binary(date(binary_to_list(Input), FormatStr));
 date({{_,_,_} = Date,{_,_,_} = Time}, FormatStr) ->
@@ -250,8 +252,13 @@ date(Input, _FormatStr) when is_list(Input) ->
 null_to_hyphen(null) -> <<"-">>;
 null_to_hyphen(Input) -> Input.
 
+null(null) -> <<"">>;
+null(Input) -> Input.
+null(null, Alternative) -> Alternative;
+null(_Input, Alternative) -> Alternative.
+
 %% @doc Humanize seconds from 61 seconds to 00:01:01
-hseconds(null) -> <<"null">>;
+hseconds(null) -> <<"">>;
 hseconds(I) when is_integer(I) ->
     S = I rem 60,
     M = I div 60,
