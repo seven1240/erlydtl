@@ -263,7 +263,7 @@ hseconds(I) when is_integer(I) ->
     S = I rem 60,
     M = I div 60,
     M1 = M rem 60,
-    H = M1 div 60,
+    H = M div 60,
     case H == 0 of
         true ->
             io_lib:format("~2.10.0b:~2.10.0b", [M1, S]);
