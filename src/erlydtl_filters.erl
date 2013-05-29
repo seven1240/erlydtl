@@ -5,7 +5,7 @@
 %%% @copyright 2008 Roberto Saccon, Evan Miller
 %%% @doc
 %%% Template filters
-%%% @end 
+%%% @end
 %%%
 %%% The MIT License
 %%%
@@ -35,17 +35,17 @@
 -author('rsaccon@gmail.com').
 -author('emmiller@gmail.com').
 -author('drew dot gulino at google dot com').
- 
+
 -define(TEST,"").
 %-define(NOTEST,1).
 -define(NODEBUG,1).
 -include_lib("eunit/include/eunit.hrl").
- 
+
 -ifdef(TEST).
         -export([cast_to_float/1,cast_to_integer/1,stringformat_io/7,round/2,unjoin/2,addDefaultURI/1]).
 -endif.
- 
- 
+
+
 -export([add/2,
         addslashes/1,
         capfirst/1,
@@ -82,7 +82,7 @@
         linenumbers/1,
         ljust/2,
         lower/1,
-        make_list/1, 
+        make_list/1,
         phone2numeric/1,
         pluralize/1,
         pluralize/2,
@@ -117,7 +117,7 @@
         wordcount/1,
         wordwrap/2,
         yesno/2]).
- 
+
 -define(NO_ENCODE(C), ((C >= $a andalso C =< $z) orelse
         (C >= $A andalso C =< $Z) orelse
         (C >= $0 andalso C =< $9) orelse
@@ -125,8 +125,8 @@
         orelse C =:= $~ orelse C =:= $_))).
 
 -define(NO_IRI_ENCODE(C), (?NO_ENCODE(C) orelse (
-            C =:= $/ orelse 
-            C =:= $# orelse 
+            C =:= $/ orelse
+            C =:= $# orelse
             C =:= $[ orelse
             C =:= $] orelse
             C =:= $= orelse
@@ -144,7 +144,7 @@
             C =:= $@ orelse
             C =:= $' orelse
             C =:= $~))).
- 
+
 -define(KILOBYTE, 1024).
 -define(MEGABYTE, (1024 * ?KILOBYTE)).
 -define(GIGABYTE, (1024 * ?MEGABYTE)).
@@ -155,7 +155,7 @@
 -define(SECONDS_PER_WEEK,   (7 * ?SECONDS_PER_DAY)).
 -define(SECONDS_PER_MONTH, (30 * ?SECONDS_PER_DAY)).
 -define(SECONDS_PER_YEAR, (365 * ?SECONDS_PER_DAY)).
- 
+
 %% @doc Adds to values
 add(LHS, RHS) when is_number(LHS), is_number(RHS) ->
     LHS + RHS;
@@ -202,13 +202,13 @@ to_numeric(List) ->
 		    undefined
 	    end
     end.
- 
+
 %% @doc Adds slashes before quotes.
 addslashes(Input) when is_binary(Input) ->
     addslashes(binary_to_list(Input));
 addslashes(Input) when is_list(Input) ->
     addslashes(Input, []).
- 
+
 %% @doc Capitalizes the first character of the value.
 capfirst([H|T]) when H >= $a andalso H =< $z ->
     [H + $A - $a | T];
@@ -218,13 +218,13 @@ capfirst(<<Byte:8/integer, Binary/binary>>) when Byte >= $a andalso Byte =< $z -
     [(Byte + $A - $a)|binary_to_list(Binary)];
 capfirst(Other) when is_binary(Other) ->
     Other.
- 
+
 %% @doc Centers the value in a field of a given width.
 center(Input, Number) when is_binary(Input) ->
     list_to_binary(center(binary_to_list(Input), Number));
 center(Input, Number) when is_list(Input) ->
     string:centre(Input, Number).
- 
+
 %% @doc Removes all values of arg from the given string.
 cut(Input, Arg) when is_binary(Arg) ->
     cut(Input, binary_to_list(Arg));
@@ -232,7 +232,7 @@ cut(Input, Arg) when is_binary(Input) ->
     cut(binary_to_list(Input), Arg);
 cut(Input, [Char]) when is_list(Input) ->
     cut(Input, Char, []).
- 
+
 %% @doc Formats a date according to the default format.
 date(Input) ->
     date(Input, "F j, Y").
@@ -260,15 +260,15 @@ null(_Input, Alternative) -> Alternative.
 %% @doc Humanize seconds from 61 seconds to 00:01:01
 hseconds(null) -> <<"">>;
 hseconds(I) when is_integer(I) ->
-    S = I rem 60,
-    M = I div 60,
-    M1 = M rem 60,
-    H = M1 div 60,
-    case H == 0 of
-        true ->
-            io_lib:format("~2.10.0b:~2.10.0b", [M1, S]);
-        false ->
-            io_lib:format("~2.10.0b:~2.10.0b:~2.10.0b", [H, M1, S])
+   H = I div 3600,
+   M = (I - H*3600) div 60,
+   S = (I - H * 3600) rem 60,
+   case H == 0 of
+    true ->
+        io_lib:format("~2.10.0b:~2.10.0b", [M, S]);
+
+    false ->
+        io_lib:format("~2.10.0b:~2.10.0b:~2.10.0b", [H, M, S])
     end.
 
 %% @doc If value evaluates to `false', use given default. Otherwise, use the value.
@@ -363,7 +363,7 @@ floatformat_io(Number, Precision) when Precision > 0 ->
     Format = lists:flatten(io_lib:format("~~.~Bf",[Precision])),
     [Result] = io_lib:format(Format,[Number]),
     Result;
-floatformat_io(Number, Precision) when Precision < 0 ->   
+floatformat_io(Number, Precision) when Precision < 0 ->
     Round = erlang:round(Number),
     RoundPrecision = round(Number, -Precision),
     case RoundPrecision == Round of
@@ -505,7 +505,7 @@ lower(Input) when is_binary(Input) ->
 lower(Input) ->
     string:to_lower(Input).
 
-%% @doc Returns the value turned into a list. For an integer, it's a list of digits. 
+%% @doc Returns the value turned into a list. For an integer, it's a list of digits.
 %% For a string, it's a list of characters.
 %% Added this for DTL compatibility, but since strings are lists in Erlang, no need for this.
 make_list(Input) when is_binary(Input) ->
@@ -615,7 +615,7 @@ stringformat(Input, Conversion) ->
 
 %% @doc
 %% A conversion specifier contains two or more characters and has the following components, which must occur in this order:
-%% 
+%%
 %%    1. The "%" character, which marks the start of the specifier.
 %%    2. Mapping key (optional), consisting of a parenthesised sequence of characters (for example, (somename)).
 %%    3. Conversion flags (optional), which affect the result of some conversion types.
@@ -663,7 +663,7 @@ stringformat_io(Input, Conversion, _ConversionFlag, _MinFieldWidth,
 stringformat_io(Input, _Conversion, "-", MinFieldWidth,
     _Precision, PrecisionLength, "d") when MinFieldWidth > 0 ->
     %Format = "~" ++ re:replace(Conversion, "d", "B", [{return, list}] ),
-    DecimalFormat = "~" ++ integer_to_list(PrecisionLength) ++ "..0B", 
+    DecimalFormat = "~" ++ integer_to_list(PrecisionLength) ++ "..0B",
     Decimal = lists:flatten( io_lib:format(DecimalFormat, [cast_to_integer(Input)]) ),
     SpaceFormat = "~" ++ integer_to_list(MinFieldWidth - erlang:length(Decimal)) ++ "s",
     Spaces = io_lib:format(SpaceFormat,[""]),
@@ -673,7 +673,7 @@ stringformat_io(Input, _Conversion, "-", MinFieldWidth,
 stringformat_io(Input, _Conversion, _ConversionFlag, MinFieldWidth,
     _Precision, PrecisionLength, "d") when MinFieldWidth > 0 ->
     %Format = "~" ++ re:replace(Conversion, "d", "B", [{return, list}] ),
-    DecimalFormat = "~" ++ integer_to_list(PrecisionLength) ++ "..0B", 
+    DecimalFormat = "~" ++ integer_to_list(PrecisionLength) ++ "..0B",
     Decimal = lists:flatten( io_lib:format(DecimalFormat, [cast_to_integer(Input)]) ),
     SpaceFormat = "~" ++ integer_to_list(MinFieldWidth - erlang:length(Decimal)) ++ "s",
     Spaces = io_lib:format(SpaceFormat,[""]),
@@ -685,7 +685,7 @@ stringformat_io(Input, _Conversion, _ConversionFlag, _MinFieldWidth,
     %Conversion = [ConversionFlag, MinFieldWidth, Precision, PrecisionLength, ConversionType],
     %Format = "~" ++ PrecisionLength ++ "..0" ++ re:replace(Conversion, "d", "B", [{return, list}] ),
     %?debugFmt("precision d, Conversion: ~p~n", [Conversion]),
-    Format = lists:flatten("~" ++ io_lib:format("~B..0B",[PrecisionLength])), 
+    Format = lists:flatten("~" ++ io_lib:format("~B..0B",[PrecisionLength])),
     ?debugFmt("Format: ~p~n",[Format]),
     io_lib:format(Format, [cast_to_integer(Input)]);
 stringformat_io(Input, Conversion, _ConversionFlag, _MinFieldWidth,
@@ -719,7 +719,7 @@ stringformat_io(Input, Conversion, ConversionFlag, MinFieldWidth,
     %io:format("Raw: ~p~n", [Raw]),
     Elocate = string:rstr(Raw,"e+"),
     %io:format("Elocate: ~p~n", [Elocate]),
-    String = [string:substr(Raw,1,Elocate-1) ++ "e+" 
+    String = [string:substr(Raw,1,Elocate-1) ++ "e+"
         ++ io_lib:format("~2..0B",[list_to_integer(string:substr(Raw,Elocate+2))])], %works till +99, then outputs "**"
     %io:format("String: ~p~n", [String]),
     String;
@@ -763,7 +763,7 @@ cast_to_integer(Input) when is_list(Input)->
     case lists:member($., Input) of
         true ->
             erlang:round(erlang:list_to_float(Input));
-        false ->       
+        false ->
             erlang:list_to_integer(Input)
     end.
 
@@ -809,7 +809,7 @@ timesince0(Seconds, Acc, Terms) when Seconds >= ?SECONDS_PER_MINUTE ->
     timesince0(Seconds rem ?SECONDS_PER_MINUTE,[io_lib:format("~B ~s~s", [Minutes, "minute", pluralize(Minutes)])|Acc], Terms+1);
 timesince0(Seconds, Acc, Terms) when Seconds >= 1 ->
     timesince0(0, [io_lib:format("~B ~s~s", [Seconds, "second", pluralize(Seconds)])|Acc], Terms+1);
-timesince0(Seconds, [], 0) when Seconds =< 0 -> 
+timesince0(Seconds, [], 0) when Seconds =< 0 ->
     timesince0(0, ["0 minutes"], 1);
 timesince0(0, Acc, Terms) ->
     timesince0(0, Acc, Terms+1).
@@ -850,11 +850,11 @@ truncatewords_html(Input, Max) when is_binary(Input) ->
 truncatewords_html(Input, Max) ->
     truncatewords_html(Input, Max, [], [], text).
 
-%% @doc Recursively takes a self-nested list and returns an HTML unordered list -- WITHOUT opening and closing `<ul>' tags. 
+%% @doc Recursively takes a self-nested list and returns an HTML unordered list -- WITHOUT opening and closing `<ul>' tags.
 unordered_list(List) ->
     String = lists:flatten(unordered_list(List, [])),
     string:substr(String, 5, erlang:length(String) - 9).
-  
+
 unordered_list([], Acc) ->
     ["<ul>", lists:reverse(Acc), "</ul>"];
 unordered_list([First|_] = List, []) when is_integer(First) ->
