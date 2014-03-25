@@ -56,6 +56,8 @@
         null_to_hyphen/1,
         null/1,
         null/2,
+        undefined/1,
+        undefined/2,
         hseconds/1,
         default/2,
         default_if_none/2,
@@ -251,6 +253,12 @@ date(Input, _FormatStr) when is_list(Input) ->
 
 null_to_hyphen(null) -> <<"-">>;
 null_to_hyphen(Input) -> Input.
+
+undefined(undefined) -> <<"">>;
+undefined(Input) -> Input.
+
+undefined(undefined, Alternative) -> Alternative;
+undefined(_Input, Alternative) -> Alternative.
 
 null(null) -> <<"">>;
 null(Input) -> Input.
