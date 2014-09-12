@@ -756,7 +756,16 @@ translated_ast({string_literal, _, String}, Context, TreeWalker) ->
         #ast_info{translatable_strings = [NewStr]}, TreeWalker);
 translated_ast(ValueToken, Context, TreeWalker) ->
     {{Ast, Info}, TreeWalker1} = value_ast(ValueToken, true, Context, TreeWalker),
-    translated_ast2(Ast, Ast, Info, TreeWalker1).
+    case Context#dtl_context.locale of
+        none ->
+            translated_ast2(Ast, Ast, Info, TreeWalker1);
+        Local ->
+            StringLookupAst = erl_syntax:application(
+                erl_syntax:atom(erlydtl_i18n),
+                erl_syntax:atom(translate),
+                [Ast, erl_syntax:string(Local)]),
+            {{StringLookupAst, Info}, TreeWalker1}
+    end.
 
 translated_ast2(NewStrAst, DefaultStringAst, AstInfo, TreeWalker) ->
     StringLookupAst = erl_syntax:application(
