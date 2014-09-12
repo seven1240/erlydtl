@@ -97,7 +97,7 @@ scan([], Scanned, _, in_text) ->
                             "templatetag", "openblock", "closeblock", "openvariable", "closevariable", "openbrace", "closebrace", "opencomment", "closecomment",
 
                             % "url", - implemented as custom tag
-
+"lookup",
                             "widthratio",
 
                             "call", "with", "endwith",

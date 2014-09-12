@@ -91,6 +91,12 @@ translate(String, TranslationFun, Default) when is_function(TranslationFun) ->
         Str -> Str
     end.
 
+lookup(K, PPList) ->
+    case proplists:get_value(list_to_binary(K), PPList) of
+        undefined -> K;
+        V -> V
+    end.
+
 are_equal(Arg1, Arg2) when Arg1 =:= Arg2 ->
     true;
 are_equal(Arg1, Arg2) when is_binary(Arg1) ->

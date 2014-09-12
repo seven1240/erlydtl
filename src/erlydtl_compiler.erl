@@ -607,6 +607,8 @@ body_ast(DjangoParseTree, Context, TreeWalker) ->
                 templatetag_ast(TagName, Context, TreeWalkerAcc);
             ({'trans', Value}, TreeWalkerAcc) ->
                 translated_ast(Value, Context, TreeWalkerAcc);
+            ({'lookup', Key, PPList}, TreeWalkerAcc) ->
+                lookup_ast(Key, PPList, Context, TreeWalkerAcc);
             ({'widthratio', Numerator, Denominator, Scale}, TreeWalkerAcc) ->
                 widthratio_ast(Numerator, Denominator, Scale, Context, TreeWalkerAcc);
             ({'with', Args, Contents}, TreeWalkerAcc) ->
@@ -773,6 +775,15 @@ translated_ast2(NewStrAst, DefaultStringAst, AstInfo, TreeWalker) ->
         erl_syntax:atom(translate),
         [NewStrAst, erl_syntax:variable("TranslationFun"), DefaultStringAst]),
     {{StringLookupAst, AstInfo}, TreeWalker}.
+
+lookup_ast({string_literal, _, String}, PPList, Context, TreeWalker) ->
+    NewStr = unescape_string_literal(String),
+    {PPListAst, _DictVarName} = resolve_variable_ast(PPList, Context),
+    LookupAst = erl_syntax:application(
+        erl_syntax:atom(erlydtl_runtime),
+        erl_syntax:atom(lookup),
+        [erl_syntax:string(NewStr), PPListAst]),
+    {{LookupAst, #ast_info{}}, TreeWalker}.
 
 % Completely unnecessary in ErlyDTL (use {{ "{%" }} etc), but implemented for compatibility.
 templatetag_ast('openblock', Context, TreeWalker) ->
